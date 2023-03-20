@@ -40,5 +40,13 @@ public class Task3 extends AndroidStartup<Void> {
         return depends;
     }
 
+    @Override
+    public boolean callCreateOnMainThread() {
+        return false;
+    }
 
+    @Override
+    public boolean waitOnMainThread() {
+        return false;
+    }
 }
