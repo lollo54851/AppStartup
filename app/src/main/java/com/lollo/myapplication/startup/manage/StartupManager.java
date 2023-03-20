@@ -5,9 +5,9 @@ import android.os.Looper;
 
 
 import com.lollo.myapplication.startup.AndroidStartup;
-import com.lollo.myapplication.startup.Result;
 import com.lollo.myapplication.startup.Startup;
 import com.lollo.myapplication.startup.StartupSortStore;
+import com.lollo.myapplication.startup.run.StartupRunnable;
 import com.lollo.myapplication.startup.sort.TopologySort;
 
 import java.util.ArrayList;
@@ -30,12 +30,29 @@ public class StartupManager {
             throw new RuntimeException("请在主线程调用！");
         }
         startupSortStore = TopologySort.sort(startupList);
-        for (Startup<?> startup : startupSortStore.result) {
-            Object result = startup.create(context);
-            StartupCacheManager.getInstance().saveInitializedComponent(
-                    startup.getClass(), new Result(result));
+        for (Startup<?> startup : startupSortStore.getResult()) {
+            StartupRunnable startupRunnable = new StartupRunnable(context, startup, this);
+            if (startup.callCreateOnMainThread()) {
+                startupRunnable.run();
+            } else {
+                startup.executor().execute(startupRunnable);
+            }
         }
         return this;
+    }
+
+    public void notifyChildren(Startup<?> startup) {
+        //获得已经完成的当前任务的所有子任务
+        if (startupSortStore
+                .getStartupChildrenMap().containsKey(startup.getClass())) {
+            List<Class<? extends Startup>> childStartupCls = startupSortStore
+                    .getStartupChildrenMap().get(startup.getClass());
+            for (Class<? extends Startup> cls : childStartupCls) {
+                //通知子任务 startup父任务已完成
+                Startup<?> childStartup = startupSortStore.getStartupMap().get(cls);
+                childStartup.toNotify();
+            }
+        }
     }
 
 
