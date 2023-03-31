@@ -19,6 +19,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--
+        创建并添加任务方式二:通过配置ContentProvider
+        只需要配置整个任务图中的最后一个任务即可
+        StartupInitializer将完成所有其他依赖任务的检索
+        注意：如果有Task6只依赖Task1，则需要添加Task6的配置
+        -->
+        <provider
+            android:name="com.lollo.myapplication.startup.provider.StartupProvider"
+            android:authorities="${applicationId}.android_startup"
+            android:exported="false">
+            <meta-data
+                android:name="com.lollo.myapplication.tasks.Task5"
+                android:value="android.startup" />
+        </provider>
+
     </application>
 
 </manifest>

@@ -2,14 +2,10 @@ package com.lollo.myapplication.startup.manage;
 
 import android.content.Context;
 import android.os.Looper;
-
-
-import com.lollo.myapplication.startup.AndroidStartup;
 import com.lollo.myapplication.startup.Startup;
 import com.lollo.myapplication.startup.StartupSortStore;
 import com.lollo.myapplication.startup.run.StartupRunnable;
 import com.lollo.myapplication.startup.sort.TopologySort;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -70,16 +66,15 @@ public class StartupManager {
     public static class Builder {
         private List<Startup<?>> startupList = new ArrayList<>();
 
-        public Builder addStartup(AndroidStartup<?> startup) {
+        public Builder addStartup(Startup<?> startup) {
             startupList.add(startup);
             return this;
         }
 
-        public Builder addAllStartup(List<AndroidStartup<?>> startups) {
+        public Builder addAllStartup(List<Startup<?>> startups) {
             startupList.addAll(startups);
             return this;
         }
-
 
         public StartupManager build(Context context) {
             AtomicInteger needAwaitCount = new AtomicInteger();
@@ -94,5 +89,4 @@ public class StartupManager {
             return new StartupManager(context, startupList, awaitCountDownLatch);
         }
     }
-
 }
